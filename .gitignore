@@ -1,4 +1,6 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Archivos de configuración del IDE
+.vscode/
+.idea/
 
 # dependencies
 /node_modules
@@ -23,6 +25,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
 
 # local env files
 .env*.local
@@ -34,3 +37,29 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Docker
+*.tar
+*.img
+
+# Cache de pip
+pip-wheel-metadata/
+*.egg-info/
+dist/
+build/
+
+# Test coverage
+htmlcov/
+.tox/
+.coverage
+.cache
+.pytest_cache/
+
+# Archivos temporales
+*.tmp
