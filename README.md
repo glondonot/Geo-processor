@@ -2,6 +2,28 @@
 
 A full-stack application for geographic data processing, providing tools for coordinate management, centroid calculation, and boundary determination.
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Screenshots](#screenshots)
+- [Architecture](#architecture)
+  - [Repository Structure - Monorepo Approach](#repository-structure---monorepo-approach)
+  - [Network Architecture and Security](#network-architecture-and-security)
+  - [Technical Stack](#technical-stack)
+- [Features & Implementation Decisions](#features--implementation-decisions)
+  - [Architecture Decisions](#architecture-decisions)
+  - [Frontend Design Decisions](#frontend-design-decisions)
+  - [Backend Design Decisions](#backend-design-decisions)
+  - [API Gateway Decisions](#api-gateway-decisions)
+- [Running the Application](#running-the-application)
+  - [Prerequisites](#prerequisites)
+  - [Setup and Installation](#setup-and-installation)
+- [API Documentation](#api-documentation)
+- [Testing](#testing)
+- [Technical Challenge Requirements](#technical-challenge-requirements)
+- [Image Gallery](#image-gallery)
+- [Contact](#contact)
+
 ## Overview
 
 GeoProcessor is a professional geospatial data processing application built as a technical challenge. The application allows users to:
@@ -11,6 +33,20 @@ GeoProcessor is a professional geospatial data processing application built as a
 - Calculate the centroid (geometric center) of points
 - Determine the bounding box (north, south, east, west limits)
 - Export results in JSON and CSV formats
+
+## Screenshots
+
+### Main Interface
+![Main Interface](docs/images/main-interface.png)
+
+### Map Visualization
+![Map View](docs/images/map-view.png)
+
+### Coordinates Panel
+![Coordinates Panel](docs/images/coords-panel.png)
+
+### Results Panel
+![Results Panel](docs/images/results-panel.png)
 
 ## Architecture
 
