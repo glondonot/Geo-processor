@@ -20,8 +20,6 @@ A full-stack application for geographic data processing, providing tools for coo
   - [Setup and Installation](#setup-and-installation)
 - [API Documentation](#api-documentation)
 - [Testing](#testing)
-- [Technical Challenge Requirements](#technical-challenge-requirements)
-- [Image Gallery](#image-gallery)
 - [Contact](#contact)
 
 ## Overview
@@ -269,16 +267,6 @@ The application is built on a modern, scalable tech stack:
    cd services/frontend
    npm run test
    ```
-
-## Technical Challenge Requirements
-
-This project was developed as part of a technical challenge with the following requirements:
-
-1. ✅ **Repository Structure**: Implemented as a monorepo with documented reasoning
-2. ✅ **Comprehensive README**: Detailed all decisions and included run instructions
-3. ✅ **Python Repository**: Implemented with FastAPI in the backend service
-4. ✅ **NestJS Repository**: Implemented as the API Gateway service
-5. ✅ **NextJS Repository**: Implemented as the frontend service
 
 ## Contact
 
