@@ -2,8 +2,6 @@
 
 A full-stack application for geographic data processing, providing tools for coordinate management, centroid calculation, and boundary determination.
 
-![GeoProcessor Logo](https://github.com/glondonot/Geo-processor/blob/main/services/frontend/public/globe.svg)
-
 ## Overview
 
 GeoProcessor is a professional geospatial data processing application built as a technical challenge. The application allows users to:
