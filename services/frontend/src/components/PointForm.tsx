@@ -1,7 +1,5 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import { Point, GeoResponse } from '@/types/coordinatesDto';
-import { processPoints } from '@/services/api';
 
 type FormValues = {
   lat: number;
@@ -9,114 +7,104 @@ type FormValues = {
 };
 
 interface Props {
-  onResult: (data: GeoResponse) => void;
+  onAddPoint: (point: FormValues) => void;
 }
 
-export default function PointForm({ onResult }: Props) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>();
-  const [points, setPoints] = useState<Point[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default function PointForm({ onAddPoint }: Props) {
+  const [isRandom, setIsRandom] = useState(false);
+  
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<FormValues>();
 
-  const addPoint = (data: FormValues) => {
-    setPoints(prev => [...prev, { lat: data.lat, lng: data.lng }]);
+  const onSubmit = (data: FormValues) => {
+    onAddPoint({ lat: data.lat, lng: data.lng });
     reset();
   };
-
-  const removePoint = (index: number) => {
-    setPoints(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const resetPoints = () => {
-    setPoints([]);
-    setError(null);
-  };
-
-  const onSubmitToAPI = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await processPoints(points);
-      onResult(result);
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error 
-        ? err.message 
-        : (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Error al procesar los puntos.';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+  
+  const generateRandomCoordinates = () => {
+    setIsRandom(true);
+    // Generate random coordinates within valid ranges
+    const randomLat = parseFloat((Math.random() * 180 - 90).toFixed(6));
+    const randomLng = parseFloat((Math.random() * 360 - 180).toFixed(6));
+    
+    setValue('lat', randomLat);
+    setValue('lng', randomLng);
+    
+    // Reset the random state after a short delay
+    setTimeout(() => setIsRandom(false), 500);
   };
 
   return (
-    <div className="bg-white p-6 rounded-md shadow-md w-full max-w-xl mx-auto">
-      <h2 className="text-xl font-semibold mb-4">Agregar coordenadas</h2>
-      
-      <form onSubmit={handleSubmit(addPoint)} className="flex flex-col md:flex-row gap-4 mb-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 mb-4">
+      <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
+          <label htmlFor="lat" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Latitude
+          </label>
           <input
+            id="lat"
             type="number"
             step="any"
-            placeholder="Latitud (-90 a 90)"
+            placeholder="-90 to 90"
             {...register('lat', { required: true, min: -90, max: 90 })}
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md 
+                      focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                      bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
           />
-          {errors.lat && <span className="text-red-500 text-sm">Latitud inválida</span>}
+          {errors.lat && (
+            <span className="text-red-500 text-sm">Latitude must be between -90 and 90</span>
+          )}
         </div>
 
         <div className="flex-1">
+          <label htmlFor="lng" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Longitude
+          </label>
           <input
+            id="lng"
             type="number"
             step="any"
-            placeholder="Longitud (-180 a 180)"
+            placeholder="-180 to 180"
             {...register('lng', { required: true, min: -180, max: 180 })}
-            className="w-full border p-2 rounded"
+            className="w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md 
+                      focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                      bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
           />
-          {errors.lng && <span className="text-red-500 text-sm">Longitud inválida</span>}
+          {errors.lng && (
+            <span className="text-red-500 text-sm">Longitude must be between -180 and 180</span>
+          )}
         </div>
-
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Agregar
-        </button>
-      </form>
-
-      {points.length > 0 && (
-        <div className="mb-4">
-          <h3 className="font-semibold mb-2">Puntos ingresados:</h3>
-          <ul className="space-y-2">
-            {points.map((p, i) => (
-              <li key={i} className="flex justify-between items-center bg-gray-100 p-2 rounded">
-                <span>{`(${p.lat}, ${p.lng})`}</span>
-                <button
-                  onClick={() => removePoint(i)}
-                  className="text-red-500 hover:underline text-sm"
-                >
-                  Eliminar
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <div className="flex gap-2 mt-4">
+      </div>
+      
+      <div className="flex flex-col sm:flex-row gap-2">
         <button
-          onClick={onSubmitToAPI}
-          disabled={points.length === 0 || loading}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 
+                    transition-colors duration-200 flex items-center justify-center"
         >
-          {loading ? 'Procesando...' : 'Procesar'}
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+          </svg>
+          Add Point
         </button>
-
+        
         <button
-          onClick={resetPoints}
-          className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+          type="button"
+          onClick={generateRandomCoordinates}
+          className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md 
+                   hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-center"
         >
-          Limpiar
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clipRule="evenodd" />
+          </svg>
+          {isRandom ? "Generating..." : "Random Coordinates"}
         </button>
       </div>
-
-      {error && <p className="mt-4 text-red-600">{error}</p>}
-    </div>
+    </form>
   );
 }

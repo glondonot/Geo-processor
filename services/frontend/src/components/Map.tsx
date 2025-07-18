@@ -1,49 +1,31 @@
-import { MapContainer, TileLayer, Marker, Popup, Rectangle, useMap } from 'react-leaflet';
-import { GeoResponse } from '@/types/coordinatesDto';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+'use client';
+
+import dynamic from 'next/dynamic';
+import { Point, GeoResponse } from '@/types/coordinatesDto';
+
+// Dynamically import the map component to avoid SSR errors
+const MapWithNoSSR = dynamic(
+  () => import('./MapComponent'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[500px] flex items-center justify-center bg-gray-100 rounded shadow-md">
+        <div className="text-gray-500">Loading map...</div>
+      </div>
+    ),
+  }
+);
 
 interface Props {
-  result: GeoResponse;
+  points: Point[];
+  result: GeoResponse | null;
 }
 
-function FitBounds({ result }: { result: GeoResponse }) {
-  const map = useMap();
-  const bounds: [number, number][] = [
-    [result.bounds.south, result.bounds.west],
-    [result.bounds.north, result.bounds.east]
-  ];
-  map.fitBounds(bounds);
-  return null;
-}
-
-// Icono personalizado (opcional)
-const markerIcon = new L.Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-
-export default function Map({ result }: Props) {
-  const bounds: [[number, number], [number, number]] = [
-    [result.bounds.south, result.bounds.west],
-    [result.bounds.north, result.bounds.east]
-  ];
-
+export default function Map({ points, result }: Props) {
   return (
-    <MapContainer center={[result.centroid.lat, result.centroid.lng]} zoom={4} scrollWheelZoom={false} className="h-full w-full rounded-md shadow">
-      <TileLayer
-        attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-
-      <Marker position={[result.centroid.lat, result.centroid.lng]} icon={markerIcon}>
-        <Popup>Centroide</Popup>
-      </Marker>
-
-      <Rectangle bounds={bounds} pathOptions={{ color: 'blue', weight: 2 }} />
-
-      <FitBounds result={result} />
-    </MapContainer>
+    <div className="w-full">
+      <h2 className="text-xl font-semibold mb-4">Map Visualization</h2>
+      <MapWithNoSSR points={points} result={result} />
+    </div>
   );
 }

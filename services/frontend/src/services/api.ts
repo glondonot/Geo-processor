@@ -6,6 +6,6 @@ const api = axios.create({
 });
 
 export async function processPoints(points: Point[]): Promise<GeoResponse> {
-  const response = await api.post<GeoResponse>('process', { points });
+  const response = await api.post<GeoResponse>('/process', { points });
   return response.data;
 }
