@@ -1,8 +1,38 @@
 services:
+  redis:
+    image: redis:7
+    container_name: redis
+    networks:
+      - app-net
+    volumes:
+      - redis-data:/data
+
+  gateway:
+    build: ./services/api-gateway
+    ports:
+      - "3001:3001"
+    depends_on:
+      - redis
+      - backend
+    env_file:
+      - ./services/api-gateway/.env
+    networks:
+      - app-net
+
   backend:
     build:
       context: ./services/backend
-    ports:
-      - "8000:8000"
     volumes:
       - ./services/backend:/app
+    env_file:
+      - ./services/backend/.env
+    networks:
+      - app-net
+
+volumes:
+  redis-data:
+
+networks:
+  app-net:
+    driver: bridge
+    internal: false

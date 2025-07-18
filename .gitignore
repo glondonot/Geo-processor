@@ -1,14 +1,30 @@
 # Archivos de configuración del IDE
 .vscode/
 .idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
 
 # dependencies
 /node_modules
 /.pnp
 .pnp.js
 
+# compiled output
+/build
+/dist
+
 # testing
 /coverage
+/.nyc_output
+.tox/
+.coverage
+.cache
+.pytest_cache/
+htmlcov/
 
 # next.js
 /.next/
@@ -20,16 +36,24 @@
 # misc
 .DS_Store
 *.pem
+*.tmp
 
 # debug
+logs
+*.log
 npm-debug.log*
+pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-*.log
+lerna-debug.log*
 
 # local env files
-.env*.local
 .env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
 
 # vercel
 .vercel
@@ -54,12 +78,15 @@ pip-wheel-metadata/
 dist/
 build/
 
-# Test coverage
-htmlcov/
-.tox/
-.coverage
-.cache
-.pytest_cache/
+# temp directory
+.temp
+.tmp
 
-# Archivos temporales
-*.tmp
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
