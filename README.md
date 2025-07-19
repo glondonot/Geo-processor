@@ -19,6 +19,8 @@ A full-stack application for geographic data processing, providing tools for coo
   - [Prerequisites](#prerequisites)
   - [Setup and Installation](#setup-and-installation)
 - [API Documentation](#api-documentation)
+  - [Backend API Endpoints](#backend-api-endpoints)
+  - [API Gateway Endpoints](#api-gateway-endpoints)
 - [Testing](#testing)
 - [Contact](#contact)
 
@@ -236,19 +238,107 @@ The application is built on a modern, scalable tech stack:
 
 ### Backend API Endpoints
 
-- `POST /api/v1/process`: Process geographic coordinates
-  - Request: List of coordinates (latitude, longitude)
-  - Response: Centroid and bounding box
+#### `POST /api/v1/process`: Process geographic coordinates
+
+**Validaciones y restricciones implementadas:**
+
+1. **Validación geográfica estricta:**
+   - Latitud restringida al rango `-90.0` a `90.0`
+   - Longitud restringida al rango `-180.0` a `180.0`
+   - Validación automática mediante Pydantic con mensajes de error claros
+
+2. **Validación estructural:**
+   - Requerimiento mínimo de puntos (`min_items=2`) para garantizar operaciones válidas
+   - Validación de tipos para asegurar que las coordenadas sean numéricas
+   - Validación automática de la estructura JSON entrante
+
+3. **Documentación integrada:**
+   - Descripciones explícitas en cada campo para facilitar el uso de la API
+   - Ejemplos incluidos en la definición del esquema
+   - Documentación automática OpenAPI con Swagger
+
+**Manejo de errores específicos:**
+
+| Código | Tipo de Error | Descripción | Validación Implementada |
+|--------|---------------|-------------|-------------------------|
+| 400 | Bad Request | Error de validación de coordenadas | Verificación de rangos geográficos válidos |
+| 400 | Bad Request | Puntos insuficientes | Validación de mínimo 2 puntos para operaciones |
+| 422 | Unprocessable Entity | Formato de entrada inválido | Validación estructural del JSON y tipos de datos |
+| 500 | Internal Server Error | Error en procesamiento | Manejo de excepciones durante cálculos geoespaciales |
 
 ### API Gateway Endpoints
 
-- `POST /api/process`: Forwards to backend processing endpoint
-  - Same request/response format as the backend endpoint
-  - Acts as the only access point to backend services due to network segmentation
+#### `POST /api/process`: Punto de entrada principal para procesamiento
 
-## Testing
+**Validaciones implementadas:**
 
-### Running Tests
+1. **Validación de tipos en tiempo de ejecución:**
+   - Uso de decoradores `@IsNumber()` para garantizar que las coordenadas sean numéricas
+   - Validación anidada con `@ValidateNested()` para validar cada punto en el array
+   - Uso de `@IsArray()` para asegurar que se envía un arreglo de puntos
+
+2. **Manejo robusto de errores:**
+   - Detección de errores en el cache de Redis con recuperación automática
+   - Transformación de errores del backend para proporcionar mensajes claros al cliente
+   - Uso de códigos HTTP apropiados según el tipo de error
+
+3. **Gestión resiliente de servicios externos:**
+   - Detección automática de la disponibilidad de Redis
+   - Continuidad de operación cuando Redis no está disponible
+   - Manejo específico de errores según el servicio que falla
+
+
+**Estrategias de validación y manejo de errores:**
+
+1. **Validación frontend:**
+   - Validación reactiva de coordenadas antes del envío
+   - Validación de formularios con React Hook Form
+   - Mensajes de error contextuales y específicos por campo
+   - Validación de mínimo 2 puntos antes de habilitar procesamiento
+
+2. **Capas de seguridad Gateway:**
+   - Interceptación y normalización de errores del backend
+   - Transformación de errores técnicos en mensajes amigables
+   - Reintentos automáticos para errores transitorios
+   - Degradación elegante cuando servicios externos no están disponibles
+
+3. **Gestión centralizada de errores:**
+   - Registro (logging) consistente en todos los componentes
+   - Auditoría completa de operaciones y errores
+   - Manejo de timeout y reconexión automática
+
+**Tabla de manejo de errores en API Gateway:**
+
+| Código | Tipo de Error | Validación Implementada | Experiencia de Usuario |
+|--------|---------------|-------------------------|------------------------|
+| 400 | Bad Request | Validación de campos y estructura | Mensaje específico indicando qué campo debe corregirse |
+| 404 | Not Found | Verificación de rutas y servicios | Redirección a página principal con mensaje informativo |
+| 408 | Request Timeout | Límites de tiempo configurables | Opción de reintento automático o manual |
+| 500 | Internal Server Error | Captura de excepciones no manejadas | Mensaje genérico con ID de error para seguimiento |
+| 502 | Bad Gateway | Monitoreo de disponibilidad de servicios | Notificación al usuario sobre problemas temporales |
+| 504 | Gateway Timeout | Timeouts escalonados | Sugerencia para intentar más tarde |
+
+## Testing y Validación
+
+### Estrategias de pruebas implementadas
+
+1. **Pruebas unitarias**:
+   - Validación de funciones de cálculo geoespacial
+   - Verificación de límites y casos extremos de coordenadas
+   - Pruebas de validadores de entrada con casos válidos e inválidos
+
+2. **Pruebas de integración**:
+   - Validación end-to-end del flujo de procesamiento
+   - Pruebas de caché con Redis
+   - Pruebas de resiliencia ante fallos de servicios
+
+3. **Pruebas de validación frontend**:
+   - Validación de formularios y manejo de errores UI
+   - Pruebas de interacción usuario (agregar/eliminar puntos)
+   - Verificación de la validación de mínimo 2 puntos para procesar
+
+
+### Ejecución de pruebas
 
 1. **Backend Tests**:
    ```bash
